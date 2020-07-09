@@ -1,6 +1,0 @@
-controller\UsuarioService.class
-api\Filter.class
-dao\UsuarioDao.class
-api\App.class
-model\Usuario.class
-model\Usuario_.class
