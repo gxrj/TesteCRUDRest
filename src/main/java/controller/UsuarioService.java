@@ -11,8 +11,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import model.Usuario;
 
@@ -40,8 +42,8 @@ public class UsuarioService {
     }
     
     @GET
-    @Path("/{email}")
-    public Usuario getUsuario(@PathParam("email")String email){
+    @Path("/id")
+    public Usuario getUsuario(@QueryParam("email")String email){
         Usuario u = usuarioDao.getUsuario(email);
         
         return u;
@@ -49,12 +51,14 @@ public class UsuarioService {
     
     @POST
     @Path("/{nome}/{email}")
-    public void post(@PathParam("nome") String nome, @PathParam("email") String email){
+    public Response post(@PathParam("nome") String nome, @PathParam("email") String email){
         Usuario u = new Usuario();
         u.setEmail(email);
         u.setNome(nome);
         
         usuarioDao.add(u);
+        
+        return Response.status(201).entity("Usuário criado com sucesso").build();
     }
     
     @PUT
