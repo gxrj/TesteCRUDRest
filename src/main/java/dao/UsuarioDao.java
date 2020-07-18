@@ -30,9 +30,14 @@ public class UsuarioDao {
     }
     
     public Usuario getUsuario(String email){
+        
+        try{
         Query q = em.createQuery("select u from Usuario u where u.email = :email");
         q.setParameter("email", email);
         return (Usuario) q.getSingleResult();
+        }catch(NullPointerException e){
+            return null;
+        }
     }
     
     public List<Usuario> getUsuarios(){

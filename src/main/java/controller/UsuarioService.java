@@ -1,5 +1,7 @@
 package controller;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import dao.UsuarioDao;
 import java.util.List;
 import javax.ejb.EJB;
@@ -30,44 +32,59 @@ public class UsuarioService {
     
     @Context
     private UriInfo context;
+    private Gson gson = new Gson();
     
     @EJB
     UsuarioDao usuarioDao;
     
     @GET
     public List<Usuario> getUsuarios(){
+        
         List <Usuario> list = usuarioDao.getUsuarios();
-    
         return list;
     }
     
     @GET
     @Path("/id")
     public Usuario getUsuario(@QueryParam("email")String email){
-        Usuario u = usuarioDao.getUsuario(email);
         
-        return u;
+        Usuario u = usuarioDao.getUsuario(email);
+        return u;   
     } 
     
     @POST
-    @Path("/{nome}/{email}")
-    public Response post(@PathParam("nome") String nome, @PathParam("email") String email){
-        Usuario u = new Usuario();
-        u.setEmail(email);
-        u.setNome(nome);
-        
-        usuarioDao.add(u);
+    public Response post(String userJSON){
+       
+       try{ 
+            Usuario u = gson.fromJson(userJSON, Usuario.class);
+            usuarioDao.add(u);
+       }catch(JsonSyntaxException e){
+           return Response.status(500).entity(e.getMessage()).build();
+       }
         
         return Response.status(201).entity("Usuário criado com sucesso").build();
     }
-    
+
     @PUT
-    public void put(){
-        
+    public Response put(String userJSON){
+        try{
+            Usuario u = gson.fromJson(userJSON, Usuario.class);
+            usuarioDao.update(u);
+        }catch(JsonSyntaxException e){
+            return Response.status(500).entity(e.getMessage()).build();
+        }
+        return Response.status(200).entity("Usuário atualizado com sucesso").build();
     }
     
     @DELETE
-    public void delete(){
-        
+    @Path("{email}")
+    public Response delete(@PathParam("email") String email){
+        try{
+            Usuario u = usuarioDao.getUsuario(email);
+            usuarioDao.delete(u);
+        }catch(JsonSyntaxException e){
+            return Response.status(500).entity(e.getMessage()).build();
+        }
+        return Response.status(200).entity("Usuário deletado com sucesso").build();
     }
 }

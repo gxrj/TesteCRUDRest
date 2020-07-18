@@ -16,6 +16,14 @@ public class Usuario implements Serializable{
     private String email;
 
     
+    public Usuario(){  }
+    
+    public Usuario(String email, String nome){
+        this.email = email;
+        this.nome = nome;
+    }
+    
+    
     public String getNome() {
         return nome;
     }
