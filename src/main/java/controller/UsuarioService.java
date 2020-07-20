@@ -1,7 +1,7 @@
 package controller;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
+/*import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;*/
 import dao.UsuarioDao;
 import java.util.List;
 import javax.ejb.EJB;
@@ -32,7 +32,6 @@ public class UsuarioService {
     
     @Context
     private UriInfo context;
-    private Gson gson = new Gson();
     
     @EJB
     UsuarioDao usuarioDao;
@@ -53,12 +52,11 @@ public class UsuarioService {
     } 
     
     @POST
-    public Response post(String userJSON){
+    public Response post(Usuario u){
        
        try{ 
-            Usuario u = gson.fromJson(userJSON, Usuario.class);
             usuarioDao.add(u);
-       }catch(JsonSyntaxException e){
+       }catch(Exception e){
            return Response.status(500).entity(e.getMessage()).build();
        }
         
@@ -66,11 +64,10 @@ public class UsuarioService {
     }
 
     @PUT
-    public Response put(String userJSON){
+    public Response put(Usuario u){
         try{
-            Usuario u = gson.fromJson(userJSON, Usuario.class);
             usuarioDao.update(u);
-        }catch(JsonSyntaxException e){
+        }catch(/*JsonSyntax*/Exception e){
             return Response.status(500).entity(e.getMessage()).build();
         }
         return Response.status(200).entity("Usuário atualizado com sucesso").build();
@@ -82,7 +79,7 @@ public class UsuarioService {
         try{
             Usuario u = usuarioDao.getUsuario(email);
             usuarioDao.delete(u);
-        }catch(JsonSyntaxException e){
+        }catch(Exception e){
             return Response.status(500).entity(e.getMessage()).build();
         }
         return Response.status(200).entity("Usuário deletado com sucesso").build();
