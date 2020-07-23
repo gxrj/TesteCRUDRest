@@ -1,7 +1,6 @@
 package controller;
 
-/*import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;*/
+import dao.ArquivoDao;
 import dao.UsuarioDao;
 import java.util.List;
 import javax.ejb.EJB;
@@ -18,6 +17,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import model.Arquivo;
 import model.Usuario;
 
 /**
@@ -35,6 +35,8 @@ public class UsuarioService {
     
     @EJB
     UsuarioDao usuarioDao;
+    @EJB
+    ArquivoDao arquivoDao;
     
     @GET
     public List<Usuario> getUsuarios(){
@@ -74,9 +76,19 @@ public class UsuarioService {
     }
     
     @DELETE
-    @Path("{email}")
+    @Path("/{email}")
     public Response delete(@PathParam("email") String email){
         try{
+            List<Arquivo> arquivos = arquivoDao.getArquivos(email);
+            
+            /*Por razão de compatibilidade e utilizado o for como iterator*/
+            for(Arquivo a : arquivos) arquivoDao.delete(a);
+            
+            /* O ideal seria utilizar o codigo abaixo, porem e compativel apenas com jdk-11 ou superiores
+            arquivos.forEach(a -> {
+                arquivoDao.delete(a);
+            });*/
+            
             Usuario u = usuarioDao.getUsuario(email);
             usuarioDao.delete(u);
         }catch(Exception e){

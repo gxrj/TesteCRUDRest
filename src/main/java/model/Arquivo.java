@@ -21,13 +21,13 @@ public class Arquivo implements Serializable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     Usuario usuario;
     
     private String nome;
     @Lob
     private byte[] conteudo;
-    
+    private long tamanho;
 
     public Arquivo() {}
     
@@ -67,5 +67,13 @@ public class Arquivo implements Serializable{
 
     public void setConteudo(byte[] conteudo) {
         this.conteudo = conteudo;
+    }
+
+    public long getTamanho() {
+        return tamanho;
+    }
+
+    public void setTamanho(long tamanho) {
+        this.tamanho = tamanho;
     }
 }

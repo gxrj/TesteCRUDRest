@@ -55,16 +55,13 @@ public class ArquivoService {
             @FormDataParam("file") FormDataContentDisposition metadados,
             @PathParam("email")String email) throws Exception{
         
-            
             Usuario u = usuarioDao.getUsuario(email);
             Arquivo arq = new Arquivo();
             arq.setNome(metadados.getFileName());
             arq.setUsuario(u);
-            
-            
+                       
             arq.setConteudo(this.parse(fluxoEntrada, metadados));
-            
-            u.getArquivos().add(arq);
+            arq.setTamanho(arq.getConteudo().length);
            
             arquivoDao.add(arq);
             usuarioDao.update(u);
