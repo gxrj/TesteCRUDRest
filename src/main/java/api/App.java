@@ -28,8 +28,7 @@ public class App extends Application {
 
     private void addRestResourceClasses(Set<Class<?>> resources) {
         resources.add(api.Filter.class);
-        resources.add(controller.ArquivoService.class);
-        resources.add(controller.UsuarioService.class);
+        resources.add(controller.ArquivoService.class);   
     }
     
 }

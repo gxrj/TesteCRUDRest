@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -28,6 +29,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
  * @author Souza
  */
 @Path("/docs")
+@Produces(MediaType.APPLICATION_JSON)
 public class ArquivoService {
 
     @Context
@@ -37,6 +39,7 @@ public class ArquivoService {
     @EJB
     UsuarioDao usuarioDao;
 
+    @GET
     @Path("/{email}")
     public List<Arquivo> getArquivos(@QueryParam("email") String email) {
         try {
@@ -47,9 +50,9 @@ public class ArquivoService {
     }
     
     @POST
-    @Path("/{email}")
+    @Path("/{email}/doc")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_JSON)
+    
     public Response upload(
             @FormDataParam("file") InputStream fluxoEntrada,
             @FormDataParam("file") FormDataContentDisposition metadados,
