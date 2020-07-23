@@ -2,6 +2,7 @@ package controller;
 
 import dao.ArquivoDao;
 import dao.UsuarioDao;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +12,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -45,10 +47,11 @@ public class ArquivoService {
     }
     
     @POST
-    @Path("/{email}/upload")
+    @Path("/{email}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response upload(
-            @FormDataParam("file") InputStream in,
+            @FormDataParam("file") InputStream fluxoEntrada,
             @FormDataParam("file") FormDataContentDisposition metadados,
             @PathParam("email")String email) throws Exception{
         
@@ -59,7 +62,7 @@ public class ArquivoService {
             arq.setUsuario(u);
             
             
-            arq.setConteudo(this.parse(in, metadados));
+            arq.setConteudo(this.parse(fluxoEntrada, metadados));
             
             u.getArquivos().add(arq);
            
@@ -69,17 +72,21 @@ public class ArquivoService {
         return Response.status(200).entity("Arquivo enviado com sucesso").build();
     }
     
-    public byte[] parse(InputStream in, FormDataContentDisposition meta) throws FileNotFoundException{
+    /* O método abaixo traduz um puta malabarismo para salvar o conteúdo de inputStream para um array de bytes */
+    public byte[] parse(InputStream fluxoEntrada, FormDataContentDisposition meta) throws FileNotFoundException, IOException{
         
-        byte[] blob = new byte[(int) meta.getSize()];
-       
-        try{
-            in.read(blob);
-            in.close();
-        }catch(IOException ex){
-            ex.printStackTrace();
-            return null;
-        }
+        ByteArrayOutputStream outArray = new ByteArrayOutputStream();
+        int temp = 0;
+        byte[] blob = new byte[1024];
+        
+        do{
+            outArray.write(blob, 0, temp); 
+            temp = fluxoEntrada.read(blob, 0, 1024);/* O temp registra o indice do ultimo byte da iteracao lido em fluxoEntrada*/  
+            
+        }while(temp != -1); /* Para quando a leitura do fluxoEntrada chegar ao fim */
+        
+        blob = outArray.toByteArray(); /* blob esta com novo tamanho e valores */
+        
         return blob;
     }
 }
