@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -28,7 +29,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
  *
  * @author Souza
  */
-@Path("/docs")
+@Path("/files")
 @Produces(MediaType.APPLICATION_JSON)
 public class ArquivoService {
 
@@ -40,7 +41,7 @@ public class ArquivoService {
     UsuarioDao usuarioDao;
 
     @GET
-    @Path("/{email}/list")
+    @Path("/list")
     public List<Arquivo> getArquivos(@QueryParam("email") String email) {
         try {
             return arquivoDao.getArquivos(email);
@@ -50,12 +51,12 @@ public class ArquivoService {
     }
     
     @POST
-    @Path("/{email}")
+    @Path("/new-file")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     public Response upload(
             @FormDataParam("file") InputStream fluxoEntrada,
             @FormDataParam("file") FormDataContentDisposition metadados,
-            @PathParam("email")String email) throws Exception{
+            @QueryParam("email")String email) throws Exception{
         
             Usuario u = usuarioDao.getUsuario(email);
             Arquivo arq = new Arquivo();
@@ -86,5 +87,19 @@ public class ArquivoService {
         byte[] blob = outArray.toByteArray(); 
         
         return blob;
+    }
+    
+    @DELETE
+    @Path("/file")
+    public Response delete(@QueryParam("email") String email, @QueryParam("filename") String filename){
+        try {
+            Arquivo arq = arquivoDao.getArquivo(email, filename);
+            arquivoDao.delete(arq);
+
+            return Response.status(200).entity("Arquivo excluido com sucesso").build();
+        }
+        catch(Exception e){
+            return Response.status(500).entity(e.getMessage()).build();
+        }
     }
 }

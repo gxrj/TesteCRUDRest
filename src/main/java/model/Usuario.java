@@ -3,12 +3,14 @@ package model;
 import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  *
  * @author Souza
  */
 @Entity
+@Table(name="Usuario")
 public class Usuario implements Serializable{
     
     private String nome;

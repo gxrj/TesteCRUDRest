@@ -45,4 +45,19 @@ public class ArquivoDao {
         return this.getArquivosDoUsuario( (Usuario) q.getSingleResult() );
     }
 
+    private Arquivo getArquivoByName(Usuario u, String nomeArq) {
+        Query q = em.createQuery("select a from Arquivo a where a.usuario = :u and a.nome = :filename");
+        q.setParameter("u", u);
+        q.setParameter("filename", nomeArq);
+        
+        return (Arquivo) q.getSingleResult();
+    }
+    
+    public Arquivo getArquivo(String email, String nomeArq ){
+        Query q = em.createQuery("select u from Usuario where u.email = :e");
+        q.setParameter("e", email);
+        
+        return this.getArquivoByName( (Usuario) q.getSingleResult(), nomeArq );
+    }
+
 }
