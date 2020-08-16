@@ -4,6 +4,7 @@ import dao.ArquivoDao;
 import dao.UsuarioDao;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -18,9 +19,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 import model.Arquivo;
 import model.Usuario;
+import org.apache.commons.io.FileUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
@@ -87,6 +90,21 @@ public class ArquivoService {
         byte[] blob = outArray.toByteArray(); 
         
         return blob;
+    }
+    
+    @GET
+    @Path("/file")
+    @Produces("application/pdf")
+    public Response download(@QueryParam("email") String email, @QueryParam("filename") String nomeArq) throws IOException{
+        
+        Arquivo arq = arquivoDao.getArquivo(email, nomeArq);
+        // Converte o Arquivo (personalizado) em File (arquivo padronizado) atraves da conversao do blob
+        File f = new File(arq.getNome());
+        FileUtils.writeByteArrayToFile(f, arq.getConteudo());
+        // Prepara o arquivo para envio o embutindo no response
+        ResponseBuilder res = Response.ok((Object) f);
+        res.header("Content-Disposition", "attachment; filename="+arq.getNome());
+        return res.build();
     }
     
     @DELETE

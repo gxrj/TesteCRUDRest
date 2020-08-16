@@ -18,7 +18,7 @@ public class UsuarioDao {
     EntityManager em;
    
     public void add(Usuario u){
-        em.persist(u);
+        em.persist(u);      
     }
     
     public void update(Usuario u){
