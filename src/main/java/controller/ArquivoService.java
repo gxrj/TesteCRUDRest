@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -28,6 +29,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
  * @author Souza
  */
 @Path("/docs")
+@Produces(MediaType.APPLICATION_JSON)
 public class ArquivoService {
 
     @Context
@@ -37,7 +39,8 @@ public class ArquivoService {
     @EJB
     UsuarioDao usuarioDao;
 
-    @Path("/{email}")
+    @GET
+    @Path("/{email}/list")
     public List<Arquivo> getArquivos(@QueryParam("email") String email) {
         try {
             return arquivoDao.getArquivos(email);
@@ -49,7 +52,6 @@ public class ArquivoService {
     @POST
     @Path("/{email}")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response upload(
             @FormDataParam("file") InputStream fluxoEntrada,
             @FormDataParam("file") FormDataContentDisposition metadados,
@@ -60,29 +62,28 @@ public class ArquivoService {
             arq.setNome(metadados.getFileName());
             arq.setUsuario(u);
                        
-            arq.setConteudo(this.parse(fluxoEntrada, metadados));
+            arq.setConteudo(this.converterParaBinario(fluxoEntrada, metadados));
             arq.setTamanho(arq.getConteudo().length);
            
             arquivoDao.add(arq);
-            usuarioDao.update(u);
             
         return Response.status(200).entity("Arquivo enviado com sucesso").build();
     }
     
-    /* O método abaixo traduz um puta malabarismo para salvar o conteúdo de inputStream para um array de bytes */
-    public byte[] parse(InputStream fluxoEntrada, FormDataContentDisposition meta) throws FileNotFoundException, IOException{
+    /* O método abaixo traduz um baita malabarismo para salvar o conteúdo de inputStream para um array de bytes */
+    public byte[] converterParaBinario(InputStream fluxoEntrada, FormDataContentDisposition meta) throws FileNotFoundException, IOException{
         
         ByteArrayOutputStream outArray = new ByteArrayOutputStream();
         int temp = 0;
-        byte[] blob = new byte[1024];
+        byte[] chunck = new byte[1024];
         
         do{
-            outArray.write(blob, 0, temp); 
-            temp = fluxoEntrada.read(blob, 0, 1024);/* O temp registra o indice do ultimo byte da iteracao lido em fluxoEntrada*/  
+            outArray.write(chunck, 0, temp); 
+            temp = fluxoEntrada.read(chunck, 0, 1024);/* O temp registra o indice do ultimo byte da iteracao lido em fluxoEntrada*/  
             
         }while(temp != -1); /* Para quando a leitura do fluxoEntrada chegar ao fim */
         
-        blob = outArray.toByteArray(); /* blob esta com novo tamanho e valores */
+        byte[] blob = outArray.toByteArray(); 
         
         return blob;
     }

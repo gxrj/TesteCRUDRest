@@ -32,7 +32,7 @@ public class ArquivoDao {
         
     private List<Arquivo> getArquivosDoUsuario(Usuario u){
         
-        Query q = em.createQuery("select a.nome from Arquivo a where a.usuario = :u");
+        Query q = em.createQuery("select a from Arquivo a where a.usuario = :u");
         q.setParameter("u", u);
         
         return q.getResultList();

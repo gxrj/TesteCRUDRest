@@ -69,7 +69,7 @@ public class UsuarioService {
     public Response put(Usuario u){
         try{
             usuarioDao.update(u);
-        }catch(/*JsonSyntax*/Exception e){
+        }catch(Exception e){
             return Response.status(500).entity(e.getMessage()).build();
         }
         return Response.status(200).entity("Usuário atualizado com sucesso").build();
