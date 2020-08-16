@@ -41,7 +41,7 @@ public class ArquivoDao {
     public List<Arquivo> getArquivos(String email){
         Query q = em.createQuery("select u from Usuario u where u.email = :e");
         q.setParameter("e", email);
-        
+
         return this.getArquivosDoUsuario( (Usuario) q.getSingleResult() );
     }
 
@@ -54,7 +54,7 @@ public class ArquivoDao {
     }
     
     public Arquivo getArquivo(String email, String nomeArq ){
-        Query q = em.createQuery("select u from Usuario where u.email = :e");
+        Query q = em.createQuery("select u from Usuario u where u.email = :e");
         q.setParameter("e", email);
         
         return this.getArquivoByName( (Usuario) q.getSingleResult(), nomeArq );
